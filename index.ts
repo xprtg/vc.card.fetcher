@@ -1,13 +1,24 @@
 import { createCard } from './helpers/makeCard';
 import { Card, CardStats } from "./interfaces/Card";
-import { writeData } from './helpers/writeData';
+import { checkIfCardExists, writeData } from './helpers/writeData';
 import CARD_LIBRARY, { CardLibrary, CardRarity, Elements } from './card_db/definitions';
-import { scrapeData } from './scrapeData';
+import { scrapeData } from './helpers/scrapeData';
 
 async function scrapeSequentiallyAndWriteData({ library }: { library: CardLibrary }): Promise<void> {
     try {
         for (const cardName of library.library) {
             console.log({ processing: cardName })
+
+            const exists = await checkIfCardExists({
+                name: cardName,
+                rarity: library.rarity,
+                element: library.element
+            })
+
+            if (exists) {
+                continue;
+            }
+
             const stats: CardStats[] = await scrapeData(cardName);
             const card: Card = createCard({
                 name: cardName,

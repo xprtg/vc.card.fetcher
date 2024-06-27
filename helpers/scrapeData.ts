@@ -1,6 +1,6 @@
 import puppeteer, { Browser } from 'puppeteer';
-import { CardStats } from "./interfaces/Card";
-import { getStatsFromPage } from './helpers/getStatsFromPage';
+import { CardStats } from "../interfaces/Card";
+import { getStatsFromPage } from './getStatsFromPage';
 
 let browserInstance: Browser | null = null;
 export async function scrapeData(name: string): Promise<CardStats[]> {

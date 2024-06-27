@@ -5,6 +5,7 @@ import { Card } from '../interfaces/Card'; // Asegúrate de importar tus interfa
 
 const writeFileAsync = promisify(fs.writeFile);
 const mkdirAsync = promisify(fs.mkdir);
+const accessAsync = promisify(fs.access); // Para verificar la existencia de archivos
 
 const OUT_DIR = './generate';
 
@@ -13,18 +14,30 @@ async function ensureDirectoryExists(dirPath: string) {
         await mkdirAsync(dirPath, { recursive: true });
     } catch (error) {
         console.error(`Error ensuring directory "${dirPath}" exists:`, error);
-        throw error; // Lanzamos el error para manejarlo fuera de esta función si es necesario
+        throw error;
+    }
+}
+
+export async function checkIfCardExists({ name, element, rarity }: { name: string, element: string, rarity: string }) {
+    const fileName = `${name}.json`;
+    const dirPath = path.join(OUT_DIR, rarity, element);
+    const filePath = path.join(dirPath, fileName);
+    try {
+        await accessAsync(filePath, fs.constants.F_OK);
+        return true;
+    } catch (error) {
+        return false;
     }
 }
 
 export async function writeData(card: Card) {
     const { name, element, rarity } = card;
     const fileName = `${name}.json`;
-    const dirPath = path.join(OUT_DIR, rarity, element); // Directorio basado en rarity y element
+    const dirPath = path.join(OUT_DIR, rarity, element);
     const filePath = path.join(dirPath, fileName);
 
     try {
-        await ensureDirectoryExists(dirPath); // Aseguramos que el directorio exista
+        await ensureDirectoryExists(dirPath);
     } catch (error) {
         console.error(`Error ensuring directory "${dirPath}" exists:`, error);
         return;
