@@ -1,32 +1,38 @@
 import fs from 'fs';
 import path from 'path';
-import { Card } from '../interfaces/Card';
+import { promisify } from 'util';
+import { Card } from '../interfaces/Card'; // Asegúrate de importar tus interfaces correctamente
+
+const writeFileAsync = promisify(fs.writeFile);
+const mkdirAsync = promisify(fs.mkdir);
 
 const OUT_DIR = './generate';
 
-async function ensureDirectoryExists(directory: string) {
+async function ensureDirectoryExists(dirPath: string) {
     try {
-        await fs.promises.mkdir(directory, { recursive: true });
+        await mkdirAsync(dirPath, { recursive: true });
     } catch (error) {
-        console.error(`Error creating directory "${directory}":`, error);
-        throw error;
+        console.error(`Error ensuring directory "${dirPath}" exists:`, error);
+        throw error; // Lanzamos el error para manejarlo fuera de esta función si es necesario
     }
 }
 
 export async function writeData(card: Card) {
-    const fileName = `${card.name}.json`;
-    const filePath = path.join(OUT_DIR, fileName);
+    const { name, element, rarity } = card;
+    const fileName = `${name}.json`;
+    const dirPath = path.join(OUT_DIR, rarity, element); // Directorio basado en rarity y element
+    const filePath = path.join(dirPath, fileName);
 
     try {
-        await ensureDirectoryExists(OUT_DIR);
+        await ensureDirectoryExists(dirPath); // Aseguramos que el directorio exista
     } catch (error) {
-        console.error(`Error ensuring directory "${OUT_DIR}" exists:`, error);
+        console.error(`Error ensuring directory "${dirPath}" exists:`, error);
         return;
     }
 
     try {
-        await fs.promises.writeFile(filePath, JSON.stringify(card, null, 2));
-        console.log(`File "${fileName}" created successfully in directory "${OUT_DIR}".`);
+        await writeFileAsync(filePath, JSON.stringify(card, null, 2));
+        console.log(`File "${fileName}" created successfully in directory "${dirPath}".`);
     } catch (error) {
         console.error(`Error writing file "${fileName}":`, error);
     }

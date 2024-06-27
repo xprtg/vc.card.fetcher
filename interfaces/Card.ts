@@ -1,6 +1,10 @@
+import { CardRarity, Elements } from "../card_db/definitions";
+
 export interface Card {
     name: string;
-    stats: CardStats[]
+    element: Elements;
+    rarity: CardRarity;
+    stats: CardStats[];
 }
 
 export interface CardStats {

@@ -1,38 +1,20 @@
-import puppeteer, { Browser } from 'puppeteer';
 import { createCard } from './helpers/makeCard';
-import { Card } from "./interfaces/Card";
+import { Card, CardStats } from "./interfaces/Card";
 import { writeData } from './helpers/writeData';
-import { getStatsFromPage } from './helpers/getStatsFromPage';
+import CARD_LIBRARY, { CardLibrary, CardRarity, Elements } from './card_db/definitions';
+import { scrapeData } from './scrapeData';
 
-let browserInstance: Browser | null = null;
-
-async function scrapeData(name: string): Promise<Card> {
+async function scrapeSequentiallyAndWriteData({ library }: { library: CardLibrary }): Promise<void> {
     try {
-        if (!browserInstance) {
-            browserInstance = await puppeteer.launch();
-        }
-        const url = `https://valkyriecrusade.fandom.com/wiki/${name}`;
-        const page = await browserInstance.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2' });
-
-        const stats = await getStatsFromPage(page);
-
-        const card: Card = createCard({
-            name: name,
-            stats: stats
-        });
-
-        return card;
-    } catch (error) {
-        console.error(`Error scraping ${name}:`, error);
-        throw error;
-    }
-}
-
-async function scrapeSequentiallyAndWriteData(names: string[]): Promise<void> {
-    try {
-        for (const name of names) {
-            const card: Card = await scrapeData(name);
+        for (const cardName of library.library) {
+            console.log({ processing: cardName })
+            const stats: CardStats[] = await scrapeData(cardName);
+            const card: Card = createCard({
+                name: cardName,
+                element: library.element,
+                rarity: library.rarity,
+                stats: stats
+            });
             await writeData(card);
         }
     } catch (error) {
@@ -40,9 +22,9 @@ async function scrapeSequentiallyAndWriteData(names: string[]): Promise<void> {
     }
 }
 
-const nameCardsToFetch: string[] = ['Acupuncturist', 'Aero'];
-
-scrapeSequentiallyAndWriteData(nameCardsToFetch).then(() => {
+scrapeSequentiallyAndWriteData({
+    library: CARD_LIBRARY.S!
+}).then(() => {
     console.log('All data has been scraped and written successfully.');
 }).catch((error: any) => {
     console.error('General error:', error);
