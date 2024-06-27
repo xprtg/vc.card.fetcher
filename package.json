@@ -1,0 +1,17 @@
+{
+  "name": "vc.card.scrapper",
+  "version": "1.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "tsc && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "xprtg",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "nodemon": "^3.1.4",
+    "puppeteer": "^22.12.1",
+    "ts-node": "^10.9.2"
+  }
+}
