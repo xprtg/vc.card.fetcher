@@ -1,4 +1,4 @@
-This is a card webscrapper from the game Valkyrie Crusade.
+This is a card webscrapper for the game Valkyrie Crusade which I made out of boredom.
 
 Element
 There are five elements in Valkyrie Crusade which are:
