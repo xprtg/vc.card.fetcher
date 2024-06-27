@@ -1,5 +1,6 @@
-Element
+This is a card webscrapper from the game Valkyrie Crusade.
 
+Element
 There are five elements in Valkyrie Crusade which are:
 
     Passion
@@ -12,7 +13,6 @@ Elements characterize a card and offer a damage bonus against their opposite typ
 
 
 Rarity
-
 Every card is branded with its abbreviated rarity in the upper-left corner of the card.
 
     Normal Normal / High Normal High Normal
@@ -43,8 +43,3 @@ Stats consist of various properties including:
     Defense (Reduces damage taken)
     Soldiers (Number of hit points)
     Skill Level (Level of the main skill. See Skills)
-
-
-
-
-source: https://valkyriecrusade.fandom.com/wiki/Category:Cards
