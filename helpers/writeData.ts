@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Card } from '../interfaces/Card';
 
-const OUT_DIR = './generated';
+const OUT_DIR = './generate';
 
 async function ensureDirectoryExists(directory: string) {
     try {

@@ -1,9 +1,10 @@
 export interface Card {
     name: string;
-    stats: Stats
+    stats: CardStats[]
 }
 
 export interface CardStats {
+    rarity: Rarity;
     "Max Level": number;
     Cost: number;
     Attack: [number, number];
@@ -17,8 +18,4 @@ export enum Rarity {
     GoldStar = "G★",
     XStar = "X★"
 }
-
-export type Stats = {
-    [key in Rarity]?: CardStats;
-};
 

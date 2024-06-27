@@ -1,19 +1,20 @@
 import { Page } from 'puppeteer';
-import { Stats } from '../interfaces/Card';
+import { CardStats, Rarity } from '../interfaces/Card';
 
-export async function getStatsFromPage(page: Page): Promise<Stats> {
+export async function getStatsFromPage(page: Page): Promise<CardStats[]> {
     return await page.evaluate(() => {
-        const result: Stats = {};
+        const result: CardStats[] = [];
         const cardMobile = document.querySelector('.card-mobile');
 
         if (cardMobile) {
             const paragraphs = cardMobile.querySelectorAll('p');
             paragraphs.forEach((p) => {
+                const cardStats: Partial<CardStats> = {};
+
                 const textContent = p.innerText.trim();
                 if (textContent && !p.classList.contains('mw-empty-elt')) {
                     const lines = textContent.split('\n');
-                    let starKey: string | undefined;
-                    const statObject: { [key: string]: any; } = {};
+                    let starKey: Rarity | undefined;
 
                     lines.forEach((line) => {
                         const match = line.match(/^(.*?):\s*(.*)$/);
@@ -22,26 +23,32 @@ export async function getStatsFromPage(page: Page): Promise<Stats> {
                             const value = match[2].trim();
 
                             if (key.includes('Max Level')) {
-                                starKey = key.split(' ')[0]; // Extract star rating (e.g., "0✰", "1★")
-                                statObject['Max Level'] = parseInt(value, 10);
+                                starKey = key.split(' ')[0] as Rarity;
+                                cardStats['Max Level'] = parseInt(value, 10);
                             } else if (key.includes('Cost')) {
-                                statObject['Cost'] = parseInt(value, 10);
+                                cardStats['Cost'] = parseInt(value, 10);
                             } else if (key.includes('Attack')) {
                                 const [start, end] = value.split(' / ').map(Number);
-                                statObject['Attack'] = [start, end];
+                                cardStats['Attack'] = [start, end];
                             } else if (key.includes('Defense')) {
                                 const [start, end] = value.split(' / ').map(Number);
-                                statObject['Defense'] = [start, end];
+                                cardStats['Defense'] = [start, end];
                             } else if (key.includes('Soldiers')) {
                                 const [start, end] = value.split(' / ').map(Number);
-                                statObject['Soldiers'] = [start, end];
+                                cardStats['Soldiers'] = [start, end];
                             }
                         }
                     });
 
-                    if (starKey) {
-                        // @ts-ignore
-                        result[starKey] = statObject;
+                    if (starKey && Object.keys(cardStats).length > 0) {
+                        result.push({
+                            rarity: starKey,
+                            "Max Level": cardStats['Max Level'] || 0,
+                            Cost: cardStats['Cost'] || 0,
+                            Attack: cardStats['Attack'] || [0, 0],
+                            Defense: cardStats['Defense'] || [0, 0],
+                            Soldiers: cardStats['Soldiers'] || [0, 0]
+                        });
                     }
                 }
             });

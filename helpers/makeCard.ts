@@ -1,6 +1,6 @@
-import { Card, Stats } from "../interfaces/Card";
+import { Card, CardStats } from "../interfaces/Card";
 
-export const createCard = ({ name, stats }: { name: string, stats: Stats }): Card => {
+export const createCard = ({ name, stats }: { name: string, stats: CardStats[] }): Card => {
     console.log({ buildingCardFor: name })
     return {
         name,
