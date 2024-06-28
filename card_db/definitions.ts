@@ -1,6 +1,9 @@
-import sr_cards from "./SR/sr_card_names";
+import fs from 'fs'
 
-type CARD_LIBRARY_TYPE = { [key in CardRarity]?: CardLibrary };
+const fileBuffer = fs.readFileSync(__dirname + "/card_library.json", 'utf-8')
+const data = JSON.parse(fileBuffer) as CARD_LIBRARY_TYPE
+
+type CARD_LIBRARY_TYPE = { [key in CardRarity]?: { [key in Elements]?: CardLibrary } };
 
 export enum Elements {
     Cool = "Cool",
@@ -24,8 +27,6 @@ export class CardLibrary {
     }
 }
 
-const CARD_LIBRARY: CARD_LIBRARY_TYPE = {
-    S: new CardLibrary("S", Elements.Cool, sr_cards.Cool),
-};
+const CARD_LIBRARY: CARD_LIBRARY_TYPE = data
 
 export default CARD_LIBRARY;
