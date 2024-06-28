@@ -1,9 +1,23 @@
 import { Page } from 'puppeteer';
 import { CardStats, Rarity } from '../interfaces/Card';
 
-export async function getStatsFromPage(page: Page): Promise<CardStats[]> {
-    return await page.evaluate(() => {
+// getImageUrls().then(urls => urls.forEach(url => console.log(removeQueryStringFromUrl(url))));
+
+export async function getStatsFromPage(cardName: string, page: Page): Promise<CardStats[]> {
+    return await page.evaluate((cardName) => {
         const result: CardStats[] = [];
+
+        const imageResult: string[] = [];
+        const images = document.querySelectorAll('img');
+
+        for (const img of images) {
+            const src = img.getAttribute('src');
+            if (src && src.includes(cardName)) {
+                imageResult.push(src);
+                break;
+            }
+        }
+
         const cardMobile = document.querySelector('.card-mobile');
 
         if (cardMobile) {
@@ -47,7 +61,9 @@ export async function getStatsFromPage(page: Page): Promise<CardStats[]> {
                             Cost: cardStats['Cost'] || 0,
                             Attack: cardStats['Attack'] || [0, 0],
                             Defense: cardStats['Defense'] || [0, 0],
-                            Soldiers: cardStats['Soldiers'] || [0, 0]
+                            Soldiers: cardStats['Soldiers'] || [0, 0],
+                            // @ts-ignore
+                            image_url: imageResult,
                         });
                     }
                 }
@@ -55,5 +71,5 @@ export async function getStatsFromPage(page: Page): Promise<CardStats[]> {
         }
 
         return result;
-    });
+    }, cardName);
 }

@@ -14,6 +14,7 @@ export interface CardStats {
     Attack: [number, number];
     Defense: [number, number];
     Soldiers: [number, number];
+    image_url: string
 }
 
 export enum Rarity {
