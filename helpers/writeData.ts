@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-import { Card } from '../interfaces/Card'; // Asegúrate de importar tus interfaces correctamente
+import { Card } from '../interfaces/Card';
 
 const writeFileAsync = promisify(fs.writeFile);
 const mkdirAsync = promisify(fs.mkdir);
-const accessAsync = promisify(fs.access); // Para verificar la existencia de archivos
+const accessAsync = promisify(fs.access);
 
-const OUT_DIR = './generate';
+const OUT_DIR = './generated';
 
 async function ensureDirectoryExists(dirPath: string) {
     try {

@@ -1,38 +1,33 @@
 import puppeteer, { Browser } from 'puppeteer';
 import { CardStats } from "../interfaces/Card";
 import { getStatsFromPage } from './getStatsFromPage';
-
-// Consider using a cluster module for parallel scraping (if applicable)
-// const cluster = require('cluster');
+import { updateImageUrlsByRarity } from './updateImageUrlsByRarity';
 
 let browserInstance: Browser | null = null;
 
 export async function scrapeData(name: string): Promise<CardStats[]> {
   try {
-    // Reuse existing browser if possible for efficiency
     if (!browserInstance) {
-      browserInstance = await puppeteer.launch({ headless: true }); // Adjust headless based on your needs
+      browserInstance = await puppeteer.launch({ headless: true });
     }
 
     const page = await browserInstance.newPage();
 
-    // Optimize network wait strategy based on resource type
     await page.goto(`https://valkyriecrusade.fandom.com/wiki/${name}`, {
-      waitUntil: 'domcontentloaded' // Adjust if specific resources are essential
+      waitUntil: 'domcontentloaded'
     });
 
-    // Selectively disable unnecessary features (consider performance impact)
-    await page.setJavaScriptEnabled(false); // Experiment to see if relevant
+    await page.setJavaScriptEnabled(false);
 
-    // Optionally reduce memory footprint by disabling cache (evaluate impact)
-    // await page.setCacheEnabled(false);
+    await page.setCacheEnabled(false);
 
-    const stats = await getStatsFromPage(page);
+    const stats = await getStatsFromPage(name, page);
 
-    // Close the page promptly to release resources
     await page.close();
 
-    return stats;
+    const statsWithImage = updateImageUrlsByRarity(stats)
+
+    return statsWithImage;
   } catch (error) {
     console.error(`Error scraping ${name}:`, error);
     throw error;

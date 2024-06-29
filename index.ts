@@ -15,7 +15,6 @@ async function scrapeSequentiallyAndWriteData({ library }: { library: CardLibrar
             })
 
             if (exists) {
-                console.log({ already_in_storage: cardName })
                 continue;
             }
             console.log({ processing: cardName, left: library.library.length - index })

@@ -1,12 +1,16 @@
 import { Page } from 'puppeteer';
 import { CardStats, Rarity } from '../interfaces/Card';
 
-export async function getStatsFromPage(page: Page): Promise<CardStats[]> {
+// getImageUrls().then(urls => urls.forEach(url => console.log(removeQueryStringFromUrl(url))));
+
+export async function getStatsFromPage(cardName: string, page: Page): Promise<CardStats[]> {
     return await page.evaluate(() => {
         const result: CardStats[] = [];
+
         const cardMobile = document.querySelector('.card-mobile');
 
         if (cardMobile) {
+            // stat scraping
             const paragraphs = cardMobile.querySelectorAll('p');
             paragraphs.forEach((p) => {
                 const cardStats: Partial<CardStats> = {};
@@ -47,13 +51,34 @@ export async function getStatsFromPage(page: Page): Promise<CardStats[]> {
                             Cost: cardStats['Cost'] || 0,
                             Attack: cardStats['Attack'] || [0, 0],
                             Defense: cardStats['Defense'] || [0, 0],
-                            Soldiers: cardStats['Soldiers'] || [0, 0]
+                            Soldiers: cardStats['Soldiers'] || [0, 0],
+                            image_url: "",
                         });
+                    }
+                }
+            });
+
+            // image scraping
+            const divs = cardMobile.querySelectorAll('div');
+            let counter = 0;
+            divs.forEach((div, key) => {
+                const divClass = div.classList.contains("wikia-gallery-item");
+
+                if (divClass) {
+                    const img = div.querySelector('img');
+                    if (img && img.hasAttribute('data-src')) {
+                        const imageSrc = img.getAttribute('data-src');
+                        if (result[counter] && 'image_url' in result[counter]) {
+                            // TODO: Fix cases where there's only one image
+                            // Example: Snow_Ahriman
+                            result[counter].image_url = imageSrc || ""
+                            counter++
+                        }
                     }
                 }
             });
         }
 
         return result;
-    });
+    }, cardName);
 }
