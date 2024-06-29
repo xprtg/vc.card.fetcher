@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && npm run copy-card-library && node dist/index.js",
+    "json-upload": "tsc && node dist/api_push.js",
     "copy-card-library": "xcopy /y /F card_db\\card_library.json dist\\card_db\\card_library.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,8 +12,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "nodemon": "^3.1.4",
-    "puppeteer": "^22.12.1",
-    "ts-node": "^10.9.2"
+    "puppeteer": "^22.12.1"
   }
 }

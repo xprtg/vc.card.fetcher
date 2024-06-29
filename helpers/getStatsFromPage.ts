@@ -4,23 +4,13 @@ import { CardStats, Rarity } from '../interfaces/Card';
 // getImageUrls().then(urls => urls.forEach(url => console.log(removeQueryStringFromUrl(url))));
 
 export async function getStatsFromPage(cardName: string, page: Page): Promise<CardStats[]> {
-    return await page.evaluate((cardName) => {
+    return await page.evaluate(() => {
         const result: CardStats[] = [];
-
-        const imageResult: string[] = [];
-        const images = document.querySelectorAll('img');
-
-        for (const img of images) {
-            const src = img.getAttribute('src');
-            if (src && src.includes(cardName)) {
-                imageResult.push(src);
-                break;
-            }
-        }
 
         const cardMobile = document.querySelector('.card-mobile');
 
         if (cardMobile) {
+            // stat scraping
             const paragraphs = cardMobile.querySelectorAll('p');
             paragraphs.forEach((p) => {
                 const cardStats: Partial<CardStats> = {};
@@ -62,9 +52,28 @@ export async function getStatsFromPage(cardName: string, page: Page): Promise<Ca
                             Attack: cardStats['Attack'] || [0, 0],
                             Defense: cardStats['Defense'] || [0, 0],
                             Soldiers: cardStats['Soldiers'] || [0, 0],
-                            // @ts-ignore
-                            image_url: imageResult,
+                            image_url: "",
                         });
+                    }
+                }
+            });
+
+            // image scraping
+            const divs = cardMobile.querySelectorAll('div');
+            let counter = 0;
+            divs.forEach((div, key) => {
+                const divClass = div.classList.contains("wikia-gallery-item");
+
+                if (divClass) {
+                    const img = div.querySelector('img');
+                    if (img && img.hasAttribute('data-src')) {
+                        const imageSrc = img.getAttribute('data-src');
+                        if (result[counter] && 'image_url' in result[counter]) {
+                            // TODO: Fix cases where there's only one image
+                            // Example: Snow_Ahriman
+                            result[counter].image_url = imageSrc || ""
+                            counter++
+                        }
                     }
                 }
             });

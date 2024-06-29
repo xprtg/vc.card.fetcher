@@ -18,9 +18,12 @@ export interface CardStats {
 }
 
 export enum Rarity {
-    ZeroStar = "0✰",
-    OneStar = "1★",
-    GoldStar = "G★",
-    XStar = "X★"
+    "0✰" = "0✰",
+    "1★" = "1★",
+    "2★" = "2★",
+    "3★" = "3★",
+    "4★" = "4★",
+    "G★" = "G★",
+    "X★" = "X★"
 }
 

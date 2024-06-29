@@ -1,46 +1,33 @@
 import puppeteer, { Browser } from 'puppeteer';
 import { CardStats } from "../interfaces/Card";
 import { getStatsFromPage } from './getStatsFromPage';
-import { removeQueryStringFromUrl } from './removeQueryStringFromUrl';
-
-// Consider using a cluster module for parallel scraping (if applicable)
-// const cluster = require('cluster');
+import { updateImageUrlsByRarity } from './updateImageUrlsByRarity';
 
 let browserInstance: Browser | null = null;
 
 export async function scrapeData(name: string): Promise<CardStats[]> {
   try {
-    // Reuse existing browser if possible for efficiency
     if (!browserInstance) {
-      browserInstance = await puppeteer.launch({ headless: true }); // Adjust headless based on your needs
+      browserInstance = await puppeteer.launch({ headless: true });
     }
 
     const page = await browserInstance.newPage();
 
-    // Optimize network wait strategy based on resource type
     await page.goto(`https://valkyriecrusade.fandom.com/wiki/${name}`, {
-      waitUntil: 'networkidle0' // Adjust if specific resources are essential
+      waitUntil: 'domcontentloaded'
     });
 
-    // Selectively disable unnecessary features (consider performance impact)
-    await page.setJavaScriptEnabled(false); // Experiment to see if relevant
+    await page.setJavaScriptEnabled(false);
 
-    // Optionally reduce memory footprint by disabling cache (evaluate impact)
-    // await page.setCacheEnabled(false);
+    await page.setCacheEnabled(false);
 
     const stats = await getStatsFromPage(name, page);
 
-    // Close the page promptly to release resources
     await page.close();
 
-    const modifiedStats: CardStats[] = stats.map(stat => {
-      return {
-        ...stat,
-        image_url: removeQueryStringFromUrl(stat.image_url)
-      }
-    })
+    const statsWithImage = updateImageUrlsByRarity(stats)
 
-    return modifiedStats;
+    return statsWithImage;
   } catch (error) {
     console.error(`Error scraping ${name}:`, error);
     throw error;
