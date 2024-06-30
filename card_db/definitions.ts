@@ -13,7 +13,7 @@ export enum Elements {
     Special = "Special"
 }
 
-export type CardRarity = "N" | "R" | "S" | "GSR" | "XSR" | "UR" | "GUR" | "XUR" | "LR" | "GLR" | "XLR" | "VR" | "GVR" | "XVR";
+export type CardRarity = "N" | "R" | "SR" | "UR" | "LR" | "VR"
 
 export class CardLibrary {
     rarity: CardRarity;
